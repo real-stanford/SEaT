@@ -1,0 +1,27 @@
+# sys/env files
+*.DS_Store
+.vscode/
+**/__pycache__/
+*.ipynb_checkpoints
+
+# visualizer
+visualizer/client/node_modules/
+visualizer/client/dist/
+visualizer/client/src/dist/
+visualizer/client/static/scenes/
+visualizer/server/updated_scene.json
+visualizer/server/refresh_scene.json
+visualizer/client/debug_data/
+visualizer/client/package-lock.json
+
+# dataset
+dataset/ABC_CHUNK*
+dataset/vol_match_6DoF_abc*
+real_world/dataset/
+
+# asset files
+*.gif
+*.pkl
+*.pth
+*.log
+*.png

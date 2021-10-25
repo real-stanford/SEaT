@@ -1,0 +1,5 @@
+# @package _group_
+name: "prepared_data"
+num_samples: 10
+gpu_frac: 0.05
+path: "dataset/ABC_CHUNK"

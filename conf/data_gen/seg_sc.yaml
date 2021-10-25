@@ -1,0 +1,7 @@
+# @package _group_
+name: "seg_sc"
+dataset_path: "dataset/seg_sc_abc"
+dataset_split: "train_sc"
+dataset_size: 2000
+scene_type: 'kit' # kit, object, kit+object
+gpu_frac: 0.05

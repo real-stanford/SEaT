@@ -1,0 +1,6 @@
+# @package _group_
+name: "sc_volumes"
+datadir: "dataset/vol_match_abc/val"
+num: 100
+sc_kit_path: "checkpoints/sc_kit.pth"
+sc_obj_path: "checkpoints/sc_obj.pth"

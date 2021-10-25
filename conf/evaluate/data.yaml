@@ -1,0 +1,10 @@
+# @package _group_
+name: "data"
+dataset_path: "dataset/seg_sc_abc"
+dataset_split: "train_sc"
+scene_type: 'kit'
+num_samples: 5
+dump_vols:
+  obj: True
+  obj_gifs: True
+  tsdf_gifs: True

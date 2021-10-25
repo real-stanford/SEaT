@@ -1,0 +1,212 @@
+
+      <robot name="block">
+          <material name="blue">
+          <color rgba="0.50 0.50 0.50 1.0"/>
+          </material>
+      
+          <link name="base_link">
+              <inertial>
+                  <origin rpy="0 0 0" xyz="0 0 0"/>
+                  <mass value="1"/>
+                  <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+              </inertial>
+          </link>
+
+          <link name="base">
+          <inertial>
+              <origin rpy="0 0 0" xyz="0 0 0"/>
+              <mass value="0.5"/>
+              <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+          </inertial>
+          <visual>
+              <origin rpy="0 0 0" xyz="0 0 0.01"/>
+              <geometry>
+              <mesh filename="assets/kits/base.obj" scale="1 1 1"/>
+              </geometry>
+              <material name="blue"/>
+          </visual>
+          <collision>
+              <origin rpy="0 0 0" xyz="0 0 0.01"/>
+              <geometry>
+              <mesh filename="assets/kits/base.obj" scale="1 1 1"/>
+              </geometry>
+          </collision>
+          </link>
+
+          <joint name="base_base_link" type="fixed">
+          <origin rpy="0 0 0" xyz="0 0 0"/>
+          <parent link="base_link"/>
+          <child link="base"/>
+          </joint>
+
+      
+              <link name="part_0">
+              <inertial>
+                  <origin rpy="0 0 0" xyz="0 0 0"/>
+                  <mass value="0.5"/>
+                  <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+              </inertial>
+              <visual>
+                  <origin rpy="0 0 0" xyz="0 0 0.01"/>
+                  <geometry>
+                  <mesh filename="assets/kits/k3_hexagon/kit_parts/p4.obj" scale="1 1 1"/>
+                  </geometry>
+                  <material name="blue"/>
+              </visual>
+              <collision>
+                  <origin rpy="0 0 0" xyz="0 0 0.01"/>
+                  <geometry>
+                  <mesh filename="assets/kits/k3_hexagon/kit_parts/p4.obj" scale="1 1 1"/>
+                  </geometry>
+              </collision>
+              </link>
+
+              <joint name="part_0_base_link" type="fixed">
+              <origin rpy="0 0 0" xyz="0 0 0"/>
+              <parent link="base_link"/>
+              <child link="part_0"/>
+              </joint>
+
+          
+              <link name="part_1">
+              <inertial>
+                  <origin rpy="0 0 0" xyz="0 0 0"/>
+                  <mass value="0.5"/>
+                  <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+              </inertial>
+              <visual>
+                  <origin rpy="0 0 0" xyz="0 0 0.01"/>
+                  <geometry>
+                  <mesh filename="assets/kits/k3_hexagon/kit_parts/p3.obj" scale="1 1 1"/>
+                  </geometry>
+                  <material name="blue"/>
+              </visual>
+              <collision>
+                  <origin rpy="0 0 0" xyz="0 0 0.01"/>
+                  <geometry>
+                  <mesh filename="assets/kits/k3_hexagon/kit_parts/p3.obj" scale="1 1 1"/>
+                  </geometry>
+              </collision>
+              </link>
+
+              <joint name="part_1_base_link" type="fixed">
+              <origin rpy="0 0 0" xyz="0 0 0"/>
+              <parent link="base_link"/>
+              <child link="part_1"/>
+              </joint>
+
+          
+              <link name="part_2">
+              <inertial>
+                  <origin rpy="0 0 0" xyz="0 0 0"/>
+                  <mass value="0.5"/>
+                  <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+              </inertial>
+              <visual>
+                  <origin rpy="0 0 0" xyz="0 0 0.01"/>
+                  <geometry>
+                  <mesh filename="assets/kits/k3_hexagon/kit_parts/p1.obj" scale="1 1 1"/>
+                  </geometry>
+                  <material name="blue"/>
+              </visual>
+              <collision>
+                  <origin rpy="0 0 0" xyz="0 0 0.01"/>
+                  <geometry>
+                  <mesh filename="assets/kits/k3_hexagon/kit_parts/p1.obj" scale="1 1 1"/>
+                  </geometry>
+              </collision>
+              </link>
+
+              <joint name="part_2_base_link" type="fixed">
+              <origin rpy="0 0 0" xyz="0 0 0"/>
+              <parent link="base_link"/>
+              <child link="part_2"/>
+              </joint>
+
+          
+              <link name="part_3">
+              <inertial>
+                  <origin rpy="0 0 0" xyz="0 0 0"/>
+                  <mass value="0.5"/>
+                  <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+              </inertial>
+              <visual>
+                  <origin rpy="0 0 0" xyz="0 0 0.01"/>
+                  <geometry>
+                  <mesh filename="assets/kits/k3_hexagon/kit_parts/p5.obj" scale="1 1 1"/>
+                  </geometry>
+                  <material name="blue"/>
+              </visual>
+              <collision>
+                  <origin rpy="0 0 0" xyz="0 0 0.01"/>
+                  <geometry>
+                  <mesh filename="assets/kits/k3_hexagon/kit_parts/p5.obj" scale="1 1 1"/>
+                  </geometry>
+              </collision>
+              </link>
+
+              <joint name="part_3_base_link" type="fixed">
+              <origin rpy="0 0 0" xyz="0 0 0"/>
+              <parent link="base_link"/>
+              <child link="part_3"/>
+              </joint>
+
+          
+              <link name="part_4">
+              <inertial>
+                  <origin rpy="0 0 0" xyz="0 0 0"/>
+                  <mass value="0.5"/>
+                  <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+              </inertial>
+              <visual>
+                  <origin rpy="0 0 0" xyz="0 0 0.01"/>
+                  <geometry>
+                  <mesh filename="assets/kits/k3_hexagon/kit_parts/p6.obj" scale="1 1 1"/>
+                  </geometry>
+                  <material name="blue"/>
+              </visual>
+              <collision>
+                  <origin rpy="0 0 0" xyz="0 0 0.01"/>
+                  <geometry>
+                  <mesh filename="assets/kits/k3_hexagon/kit_parts/p6.obj" scale="1 1 1"/>
+                  </geometry>
+              </collision>
+              </link>
+
+              <joint name="part_4_base_link" type="fixed">
+              <origin rpy="0 0 0" xyz="0 0 0"/>
+              <parent link="base_link"/>
+              <child link="part_4"/>
+              </joint>
+
+          
+              <link name="part_5">
+              <inertial>
+                  <origin rpy="0 0 0" xyz="0 0 0"/>
+                  <mass value="0.5"/>
+                  <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+              </inertial>
+              <visual>
+                  <origin rpy="0 0 0" xyz="0 0 0.01"/>
+                  <geometry>
+                  <mesh filename="assets/kits/k3_hexagon/kit_parts/p2.obj" scale="1 1 1"/>
+                  </geometry>
+                  <material name="blue"/>
+              </visual>
+              <collision>
+                  <origin rpy="0 0 0" xyz="0 0 0.01"/>
+                  <geometry>
+                  <mesh filename="assets/kits/k3_hexagon/kit_parts/p2.obj" scale="1 1 1"/>
+                  </geometry>
+              </collision>
+              </link>
+
+              <joint name="part_5_base_link" type="fixed">
+              <origin rpy="0 0 0" xyz="0 0 0"/>
+              <parent link="base_link"/>
+              <child link="part_5"/>
+              </joint>
+
+          
+      </robot>
+      

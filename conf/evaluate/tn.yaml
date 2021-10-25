@@ -1,0 +1,8 @@
+# @package _group_
+name: "tn"
+
+workspace_bounds: [ [0, 0.7], [-0.7, 0.7], [0.00, 0.5] ]
+image_size: [640, 1280]
+perturb_delta: 0.0276
+
+evaluate_size: 10

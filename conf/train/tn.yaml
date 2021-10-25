@@ -1,0 +1,14 @@
+# @package _group_
+name: "tn"
+
+workspace_bounds: [ [0, 0.7], [-0.7, 0.7], [0.00, 0.5] ]
+workspace_bounds_obj: [ [0, 0.7], [-0.7, 0], [0.00, 0.5] ]
+workspace_bounds_kit: [ [0, 0.7], [0, 0.7] , [0.00, 0.5] ]
+image_size: [640, 1280]
+perturb_delta: 0.02
+
+load_model: False
+model_path: ''
+
+train_steps: 100000
+save_interval: 1000

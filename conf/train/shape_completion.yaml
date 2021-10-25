@@ -1,0 +1,8 @@
+# @package _group_
+name: "shape_completion"
+dataset_path: "dataset/seg_sc_abc/"
+scene_type: 'object'
+batch_size: 40
+epochs: 1000
+save_model_every: 1
+log_path: "logs/sc_obj_new/"

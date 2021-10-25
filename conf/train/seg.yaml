@@ -1,0 +1,11 @@
+# @package _group_
+name: "seg"
+dataset_path: "dataset/seg_sc_abc/"
+use_depth: true
+normalize_depth: true
+batch_size: 4
+epochs: 500
+save_model_every: 5
+log_path: "logs"
+num_cpus: 0  # For some reason, num_workers > 6 fails on crv00 server.
+seed: "???"

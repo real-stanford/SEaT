@@ -1,0 +1,134 @@
+# TODO: Move all the things related to the model inside a particular model file
+# - for example: train, evaluate etc. etc.
+
+defaults:
+  - env: env 
+  - evaluate: tn_model
+  - ray: disabled
+  - train: shape_completion
+  - data_gen: seg_sc
+
+seeds:
+  data_split: 1
+  data_gen: 2
+  train: 3
+  test: 100
+
+preprocess_paths: ["dataset/train_sc.txt", 
+                   "dataset/val_sc.txt", 
+                   "dataset/train.txt", 
+                   "dataset/val.txt"]
+
+vol_match_6DoF:
+  # data generation
+  gpu_frac: 1
+  unit_kit: False
+  p0_vol_shape_gen: [128, 128, 128] # vox_size = 0.0008928571428571428
+  p1_vol_shape_gen: [400, 400, 256]
+  image_size: [640, 1280] # for transporternet
+  image_size_d2o: [720, 720] # for depth2orient
+
+  # dataset
+  p0_vol_shape: [128, 128, 128] # vox_size = 0.0008928571428571428
+  p1_vol_shape: [256, 256, 256]
+  p0_vol_shape_transport: [128, 128, 80]
+  p1_vol_shape_transport: [256, 256, 192]
+  max_perturb_delta: [32, 32, 32]
+  max_perturb_angle: 0.48
+  min_d: 0
+  min_angle: 0
+
+  # transporter configs
+  upsample: False
+  # rotator configs
+  delta_angle: 0.08
+  np_part: 2048
+  np_kit: 4096
+  rotator_type: "classify"
+  pointnet_type: "pointnet2"
+  regression: False
+  # for classifier
+  temperature: 1
+  dist_aware_loss: True
+  double_run: False
+  # for matcher
+  margin: 1
+  share_wts: False
+  proj_head: False
+
+  dataset_size: 1000
+  dataset_path: "dataset/vol_match_abc"
+  dataset_split: "val"
+  lite: False
+  load_model: True
+  max_yaw_pitch: 15 # for no user input, in degrees
+
+  # <-------------------------> #
+  #  without user input models  #
+  # <-------------------------> #
+
+  transporter_path: 'checkpoints/oracle_transporter_full.pth' 
+  rotator_path: 'checkpoints/oracle_rotator_full.pth'
+  vol_type: 'oracle'
+  evaluate_save_path: "val_oracle_full"
+
+  # transporter_path: 'checkpoints/sc_transporter_full.pth'
+  # rotator_path: 'checkpoints/sc_rotator_full.pth'
+  # vol_type: 'sc'
+  # evaluate_save_path: "val_sc_full"
+
+  # transporter_path: 'checkpoints/raw_transporter_full.pth'
+  # rotator_path: 'checkpoints/raw_rotator_full.pth'
+  # vol_type: 'raw'
+  # evaluate_save_path: "val_raw_full"
+
+  # <----------------------> #
+  #  with user input models  #
+  # <--------------------
+  # transporter_path: 'checkpoints/oracle_transporter.pth'
+  # rotator_path: 'checkpoints/oracle_rotator.pth'
+  # vol_type: 'oracle'
+  # evaluate_save_path: "val_oracle"
+
+  # transporter_path: 'checkpoints/sc_transporter.pth'
+  # rotator_path: 'checkpoints/sc_rotator.pth'
+  # vol_type: 'sc'
+  # evaluate_save_path: "val_sc"
+
+  # transporter_path: 'checkpoints/raw_transporter.pth'
+  # rotator_path: 'checkpoints/raw_rotator.pth'
+  # vol_type: 'raw'
+  # evaluate_save_path: "val_raw"
+  
+  evaluate_size: 100
+  evaluate_gen_gifs: False
+  use_gt_pos: False
+  use_gt_ori: False
+  no_user_input: False
+
+assets_path: "assets/"
+seed: "???"
+
+perception:
+  seg:
+    use_gt: False
+    path: "checkpoints/seg.pth"
+    use_depth: true
+    normalize_depth: true
+    mask_score_threshold: 0.5  # masks with score < this will be ignored
+    mask_threshold: 0.90  # mask >=0.9 will be treated as 1. Others will be 0
+  sc:
+    use_gt: False
+    path: "checkpoints/sc_obj.pth"
+  sc_kit:
+    path: "checkpoints/sc_kit.pth"
+  scene_path: "visualizer/client/dist/scenes/json_scene"
+  kits_path: "assets/kits/"
+  seed: "???"
+  debug_path_name: "untitled"
+
+
+hydra:
+  output_subdir: null
+  run:
+    dir: .

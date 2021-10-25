@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeleRobot client</title>
+    <style>
+        * {
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+        html, body {
+            margin: 0px;
+            height: 100%;
+        }
+        #three_div, #three_canvas{
+            width: 100%;
+            height: 100%;
+        }
+
+        .topnav {
+            overflow: hidden;
+            background-color: #333;
+            position: fixed;
+            right: 0px;
+            margin: 10px;
+        }
+
+        .topnav a {
+            float: left;
+            color: #f2f2f2;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+
+        .topnav a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+
+        .topnav a.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .server_image_div {
+            position: fixed;
+            right: 10px;
+            top: 60px;
+        }
+        .server_image_kit_div {
+            position: fixed;
+            right: 220px;
+            top: 60px;
+        }
+        .server_image {
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="topnav">
+        <a id="toggle_point_cloud">Toggle Point Cloud</a>
+        <a id="toggle_volume">Toggle Volume</a>
+        <a id="upload_scene">Upload Scene</a>
+        <a id="set_transform">Turn rotation ON</a>
+        <a id="set_transform_frame">Turn local frame ON</a>
+    </div>
+
+    <!-- <div class="server_image_div">
+        <img src="../static/scenes/json_scene/scene_KIT_rgb.png" class="server_image"/>
+    </div>
+    <div class="server_image_kit_div">
+        <img src="../static/scenes/json_scene/scene_OBJECTS_rgb.png" class="server_image"/> -->
+    </div>
+    <div id="three_div">
+        <canvas id="three_canvas"></canvas>
+    </div>
+</body>
+</html>

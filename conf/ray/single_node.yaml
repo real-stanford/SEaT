@@ -1,0 +1,4 @@
+# @package _group_
+name: "single_node"
+num_cpus: 6
+num_gpus: 1

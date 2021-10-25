@@ -1,0 +1,16 @@
+# @package _group_
+name: "sc_model"
+dataset_path: "dataset/vol_match_abc/"
+dataset_split: "train"
+scene_type: 'kit'
+model_path: "logs_arc/sc_kit/sc_18.pth"
+save_path: 'evaluate_snap_kit'
+batch_size: 1
+# scene_type: 'object'
+# model_path: "logs_arc/sc_object/sc_236.pth"
+# save_path: 'val_sc'
+# batch_size: 50
+num_workers: 12
+num_samples: 1000
+dump_vols:
+  tsdf_gifs: True

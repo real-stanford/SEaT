@@ -1,0 +1,67 @@
+0        <robot name="block">
+            <material name="blue">
+            <color rgba="0.50 0.50 0.50 1.0"/>
+            </material>
+
+            <link name="base_link">
+                <inertial>
+                    <origin rpy="0 0 0" xyz="0 0 0"/>
+                    <mass value="1"/>
+                    <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+                </inertial>
+            </link>
+
+            <link name="base">
+            <inertial>
+                <origin rpy="0 0 0" xyz="0 0 0"/>
+                <mass value="0.5"/>
+                <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+            </inertial>
+            <visual>
+                <origin rpy="0 0 0" xyz="0 0 0.01"/>
+                <geometry>
+                <mesh filename="base.obj" scale="1 1 1"/>
+                </geometry>
+                <material name="blue"/>
+            </visual>
+            <collision>
+                <origin rpy="0 0 0" xyz="0 0 0.01"/>
+                <geometry>
+                <mesh filename="base.obj" scale="1 1 1"/>
+                </geometry>
+            </collision>
+            </link>
+
+            <joint name="base_base_link" type="fixed">
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <parent link="base_link"/>
+            <child link="base"/>
+            </joint>
+
+            <link name="kit">
+            <inertial>
+                <origin rpy="0 0 0" xyz="0 0 0"/>
+                <mass value="0.5"/>
+                <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+            </inertial>
+            <visual>
+                <origin rpy="0 0 0" xyz="0 0 0.01"/>
+                <geometry>
+                <mesh filename="kit.obj" scale="1 1 1"/>
+                </geometry>
+                <material name="blue"/>
+            </visual>
+            <collision>
+                <origin rpy="0 0 0" xyz="0 0 0.01"/>
+                <geometry>
+                <mesh filename="kit_cm.obj" scale="1 1 1"/>
+                </geometry>
+            </collision>
+            </link>
+
+            <joint name="kit_base_link" type="fixed">
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <parent link="base_link"/>
+            <child link="kit"/>
+            </joint>
+        </robot>
