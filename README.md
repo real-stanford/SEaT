@@ -158,7 +158,7 @@ Finally, run the main script and follow the instructions:
 python real_wold/main.py
 ```
 
-### Real-World Object-kit Pairs
+### Real-World Object-Kit Pairs
 We store unit object-kit pairs used for our user study at [assets/test_real_3dprint](assets/test_real_3dprint).
 
 To generate more alike files for your own experiment procedurally, create a list of files in similar format as [val_real.txt](dataset/val_real.txt). Note that these should already be [preprocessed as shown above](#preprocess-abc-data). To prepare models for 3D printing, run:
