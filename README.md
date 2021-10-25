@@ -16,6 +16,13 @@ Columbia University
 
 <br>
 
+## Catalog
+
+- [Environment](#Environment)
+- [Dataset](#Dataset)
+- [Training and Testing](#Training-and-testing)
+- [System Tests with Real-World Dataset](#System-Tests-with-Real-World-Dataset)
+  
 ## Environment
 ```
 conda env create -f environment.yml
@@ -89,7 +96,9 @@ python evaluate.py evaluate=vol_match_6DoF vol_match_6DoF.dataset_split=val vol_
 cd dataset/vol_match_abc/val; python -m http.server 8000 # go to localhost:8000
 ```
 
-## Segmentation network training
+## Training and Testing
+
+### Segmentation Network
 ```bash
 python train.py train=seg
 ```
@@ -99,7 +108,7 @@ python evaluate.py evaluate=seg evaluate.save_path=logs/evaluate_seg
 cd logs/evaluate_seg; python -m http.server 8000 # go to localhost:8000
 ```
 
-## Shape completion network training
+### Shape Completion Network
 ```bash
 python train.py train=shape_completion train.scene_type=kit train.log_path=logs/sc_kit train.batch_size=2
 python train.py train=shape_completion train.scene_type=object train.log_path=logs/sc_object train.batch_size=60
@@ -110,7 +119,7 @@ python evaluate.py evaluate=sc_model evaluate.save_path=logs/evaluate_sc
 cd logs/evaluate_sc; python -m http.server 8000 # go to localhost:8000
 ```
 
-## SnapNet training
+### SnapNet
 Before train the models with shape completed volumes, make sure shape completion models are trained, define relevant model paths in [sc_volumes.yaml](conf/data_gen/sc_volumes.yaml). Then get the shape completed volumes:
 ```bash
 python data_generation.py data_gen=sc_volumes data_gen.datadir="dataset/vol_match_abc/train" data_gen.num=1000
@@ -135,7 +144,7 @@ python evaluate.py evaluate=vol_match_6DoF_model vol_match_6DoF.dataset_split=va
 cd logs/evaluate_snap; python -m http.server 8000 # go to localhost:8000
 ```
 
-## Real-world dataset
+## System Tests with Real-World Dataset
 You can download our [real-world dataset](https://drive.google.com/drive/folders/1EXvSbR2OLBUFSXLjvV37bddtZWDnjq_X?usp=sharing) for local system tests. Put the dataset at ```real_world/dataset``` and start the server and the client as follows.
 
 Start the server and the client:
@@ -149,7 +158,7 @@ Finally, run the main script and follow the instructions:
 python real_wold/main.py
 ```
 
-## Real-world test object-kit pairs
+### Real-World Object-kit Pairs
 We store unit object-kit pairs used for our user study at [assets/test_real_3dprint](assets/test_real_3dprint).
 
 To generate more alike files for your own experiment procedurally, create a list of files in similar format as [val_real.txt](dataset/val_real.txt). Note that these should already be [preprocessed as shown above](#preprocess-abc-data). To prepare models for 3D printing, run:
@@ -171,7 +180,7 @@ By default, this will generate 3D print models inside directory [assets/test_rea
 }
 ```
 
-# Acknowledgement
+## Acknowledgement
 - [Andy Zeng](http://andyzeng.github.io/) et. al. [tsdf-fusion-python](https://github.com/andyzeng/tsdf-fusion-python)
 - UR5-Controller: [Python-URX](https://github.com/SintefManufacturing/python-urx) and [@jkur's fork of it](https://github.com/jkur/python-urx/tree/SW3.5/urx)
 - [Kevin Zakka](https://kzakka.com/): [Walle](https://github.com/kevinzakka/walle)
