@@ -29,7 +29,7 @@ Install other dependencies for visualization and system tests:
 
 ## Dataset
 We create our dataset by procedurally processing [ABC Dataset](https://cs.nyu.edu/~zhongshi/publication/abc-dataset/). The following scripts default to generate the same dataset we used for all model trainings, but you could always generate diifferent data by either
-1. download different ABC data chunks by ;
+1. download different ABC data chunks by modifying [get_abc_data.sh](get_abc_data.sh);
 2. modify [train_sc.txt](dataset/train_sc.txt), [val_sc.txt](dataset/val_sc.txt), the training and validation data paths for scene completion, and/or [train.txt](dataset/train.txt), [val.txt](dataset/val.txt), the training and validation data paths for action snapping. 
 3. modify the random seeds, ```data_split``` and/or ```data_gen```, in [config.yaml](conf/config.yaml).
 
