@@ -7,9 +7,14 @@ Jen-shuo Liu,
 <br>
 Columbia University
 <br>
-<!-- [ICRA 2021](https://www.ieee-icra.org/) -->
 
-### [Project Page](https://seat.cs.columbia.edu) <!-- | [Video](https://youtu.be/Ltc-p5G1sbc) | [arXiv](https://arxiv.org/abs/2011.14206) -->
+### [Project Page](https://seat.cs.columbia.edu) | [Video](https://youtu.be/-NdR3mkPbQQ) | [arXiv](https://arxiv.org/abs/2110.04450)
+
+<br>
+
+![](assets/teaser.jpeg)
+
+<br>
 
 ## Environment
 ```
@@ -24,7 +29,7 @@ Install other dependencies for visualization and system tests:
 
 ## Dataset
 We create our dataset by procedurally processing [ABC Dataset](https://cs.nyu.edu/~zhongshi/publication/abc-dataset/). The following scripts default to generate the same dataset we used for all model trainings, but you could always generate diifferent data by either
-1. download different ABC data chunks;
+1. download different ABC data chunks by ;
 2. modify [train_sc.txt](dataset/train_sc.txt), [val_sc.txt](dataset/val_sc.txt), the training and validation data paths for scene completion, and/or [train.txt](dataset/train.txt), [val.txt](dataset/val.txt), the training and validation data paths for action snapping. 
 3. modify the random seeds, ```data_split``` and/or ```data_gen```, in [config.yaml](conf/config.yaml).
 
@@ -37,20 +42,7 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 python data_generation.py data_gen=seg_sc data_gen.
 ```
 ### Download ABC data
 ``` bash
-# create dataset folders;
-mkdir -p dataset/ABC_CHUNK_SC; mkdir dataset/ABC_CHUNK; mkdir dataset/ABC_CHUNK_VAL
-# For Shape Completion
-cd dataset/ABC_CHUNK_SC/
-wget https://archive.nyu.edu/rest/bitstreams/89388/retrieve --no-check-certificate
-7z x retrieve -r -aou
-# For SnapNet Training
-cd dataset/ABC_CHUNK
-wget https://archive.nyu.edu/rest/bitstreams/89314/retrieve --no-check-certificate
-7z x retrieve -r -aou
-# For SnapNet Validation
-cd dataset/ABC_CHUNK_VAL/
-wget https://archive.nyu.edu/rest/bitstreams/89266/retrieve --no-check-certificate
-7z x retrieve -r -aou
+./get_abc_data.sh
 ```
 ### Preprocess ABC data
 Process ABC Dataset to generate scaled objects and respective kits:
@@ -165,6 +157,19 @@ To generate more alike files for your own experiment procedurally, create a list
 python scripts/create_test_real_3dprint_objs.py
 ```
 By default, this will generate 3D print models inside directory [assets/test_real_3dprint](assets/test_real_3dprint). You may need to use software like blender to invert the generated files if the model surfaces are inverted in the 3D printing software.
+
+## BibTeX
+
+```
+@misc{agrawal2021scene,
+      title={Scene Editing as Teleoperation: A Case Study in 6DoF Kit Assembly}, 
+      author={Shubham Agrawal and Yulong Li and Jen-Shuo Liu and Steven K. Feiner and Shuran Song},
+      year={2021},
+      eprint={2110.04450},
+      archivePrefix={arXiv},
+      primaryClass={cs.RO}
+}
+```
 
 # Acknowledgement
 - [Andy Zeng](http://andyzeng.github.io/) et. al. [tsdf-fusion-python](https://github.com/andyzeng/tsdf-fusion-python)
