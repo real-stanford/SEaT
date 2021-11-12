@@ -31,7 +31,7 @@ pip install -e .
 ```
 Install other dependencies for visualization and system tests:
 - [gifsicle](https://www.lcdf.org/gifsicle/)
-- [flask](https://flask.palletsprojects.com/en/2.0.x/installation/)
+- [flask](https://flask.palletsprojects.com/en/2.0.x/installation/) and flask-cors
 - node v.16 through [nvm](https://github.com/nvm-sh/nvm)
 
 ## Dataset
