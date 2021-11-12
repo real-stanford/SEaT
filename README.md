@@ -32,7 +32,7 @@ pip install -e .
 Install other dependencies for visualization and system tests:
 - [gifsicle](https://www.lcdf.org/gifsicle/)
 - [flask](https://flask.palletsprojects.com/en/2.0.x/installation/)
-- [nvm](https://github.com/nvm-sh/nvm)
+- node v.16 through [nvm](https://github.com/nvm-sh/nvm)
 
 ## Dataset
 We create our dataset by procedurally processing [ABC Dataset](https://cs.nyu.edu/~zhongshi/publication/abc-dataset/). The following scripts default to generate the same dataset we used for all model trainings, but you could always generate diifferent data by either
