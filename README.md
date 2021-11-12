@@ -155,7 +155,7 @@ The script will run the server in the background at port 52000, and the client a
 
 Finally, run the main script and follow the instructions:
 ```bash
-python real_wold/main.py
+python real_world/main.py
 ```
 
 ### Real-World Object-Kit Pairs
