@@ -14,8 +14,6 @@ Columbia University
 
 ![](assets/teaser.jpeg)
 
-<br>
-
 ## Catalog
 
 - [Environment](#Environment)
