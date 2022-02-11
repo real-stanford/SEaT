@@ -9,7 +9,7 @@ import numpy as np
 import cv2
 from environment.real.ur5 import UR5_URX
 from environment.real.cameras import RealSense
-from real_world.utils import get_tool_init, get_workspace_bounds
+from real_world.rw_utils import get_tool_init, get_workspace_bounds
 
 
 if __name__ == "__main__":

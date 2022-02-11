@@ -115,7 +115,7 @@ perception:
     path: "checkpoints/seg.pth"
     use_depth: true
     normalize_depth: true
-    mask_score_threshold: 0.5  # masks with score < this will be ignored
+    mask_score_threshold: 0.9  # masks with score < this will be ignored
     mask_threshold: 0.90  # mask >=0.9 will be treated as 1. Others will be 0
   sc:
     use_gt: False

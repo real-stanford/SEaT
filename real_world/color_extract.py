@@ -10,7 +10,7 @@ from omegaconf import DictConfig
 import numpy as np
 from learning.srg import SRG
 from environment.real.cameras import RealSense
-from real_world.utils import color_mask_rgb, get_obj_masks_tilted
+from real_world.rw_utils import color_mask_rgb, get_obj_masks_tilted
 from matplotlib import pyplot as plt
 
 

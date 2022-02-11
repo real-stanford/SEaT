@@ -7,7 +7,7 @@ sys.path.append(str(root_path))
 
 from environment.real.ur5 import UR5_URX
 import numpy as np
-from real_world.utils import get_kit_bounds, get_obj_bounds, get_obj_masks, get_tool_init, get_workspace_bounds
+from real_world.rw_utils import get_kit_bounds, get_obj_bounds, get_obj_masks, get_tool_init, get_workspace_bounds
 from real_world.calibrate import get_calibration_bounds
 
 
@@ -43,3 +43,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+    # tool_offset, _ = get_tool_init()
+    # robot = UR5_URX(j_vel=0.2, j_acc=0.2, tool_offset=tool_offset)
+    # robot.homej()
+    # robot.set_pos_derived(np.array([0,-0.7,0]))

@@ -9,7 +9,7 @@ from environment.real.cameras import RealSense
 from matplotlib import pyplot as plt
 from matplotlib import patches
 from scipy.ndimage import rotate
-from real_world.utils import get_workspace_bounds, get_crops, transform_world_to_camera_multi
+from real_world.rw_utils import get_workspace_bounds, get_crops, transform_world_to_camera_multi
 
 
 def plot_rectangle(points_uv, color, ax):

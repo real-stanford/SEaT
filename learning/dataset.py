@@ -3,7 +3,7 @@ from operator import mul
 from utils.tsdfHelper import TSDFHelper
 from utils.rotation import invert_quat, normal_to_quat, quat_to_euler, get_quat_diff, multiply_quat, invert_quat, uniform_sample_quaternion
 from utils.ravenutils import np_unknown_cat, transform_pointcloud, get_heightmap, get_pointcloud
-from real_world.utils import get_tn_bounds, get_intrinsics
+from real_world.rw_utils import get_tn_bounds, get_intrinsics
 from environment.meshRendererEnv import MeshRendererEnv
 from pathlib import Path
 import numpy as np

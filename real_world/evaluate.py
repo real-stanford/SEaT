@@ -34,7 +34,7 @@ from utils.rotation import multiply_quat, quat_to_euler, normal_to_quat, invert_
 from utils.tsdfHelper import TSDFHelper, extend_to_bottom, get_single_biggest_cc_single
 from environment.camera import SimCameraBase
 from real_world.dataset import REAL_DATASET
-from real_world.utils import (
+from real_world.rw_utils import (
     get_empty_depth,
     get_obj_bounds,
     get_kit_bounds,

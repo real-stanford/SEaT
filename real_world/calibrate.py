@@ -9,13 +9,19 @@ import cv2
 from scipy import optimize
 from environment.real.ur5 import UR5_URX
 from environment.real.cameras import RealSense
-from real_world.utils import get_tool_init, get_workspace_bounds
+from real_world.rw_utils import get_tool_init, get_workspace_bounds
+from real_world.pyphoxi import PhoXiSensor
+import matplotlib.cm as cm
 
-
+def adjust_gamma(image, gamma=1.0):
+    invGamma = 1.0 / gamma
+    table = np.array([((i / 255.0) ** invGamma) * 255 for i in np.arange(0, 256)]).astype("uint8")
+    return cv2.LUT(image, table)
+    
 def get_calibration_bounds():
     return np.array([
-        [-0.58,  -0.48],
-        [-0.23, 0.05],
+        [-0.16, 0.08],
+        [-0.74, -0.58],
         [0.02, 0.258]
     ])
 
@@ -24,16 +30,20 @@ if __name__ == "__main__":
     tool_offset, tool_orientation = get_tool_init()
     workspace_bounds = get_calibration_bounds()
 
+    tcp_ip = "127.0.0.1"
+    tcp_port = 50200
     # Connect to the camera (see https://github.com/columbia-robovision/PyRealSense for more details)
-    bin_cam = RealSense(cam_pose_path=None, cam_depth_scale_path=None)
+    # bin_cam = RealSense(cam_pose_path=None, cam_depth_scale_path=None)
+    photoneo_camera = PhoXiSensor(tcp_ip, tcp_port)
+    photoneo_camera.start()
 
     # Tool offset from tip of UR5's last joint
     robot = UR5_URX(j_vel=0.5, j_acc=0.5, tool_offset=tool_offset)
     robot.homej()
-    input("Running calibration. Press Enter to continue...")
+    # input("Running calibration. Press Enter to continue...")
 
     # Constants
-    calib_grid_step = 0.03
+    calib_grid_step = 0.08
     checkerboard_offset = np.array([-(0.03356 + 0.001) / 2, 0, tool_offset[2] - 0.09])
 
     # Construct 3D calibration grid across workspace
@@ -50,53 +60,68 @@ if __name__ == "__main__":
     calib_grid_z.shape = (num_calib_grid_pts, 1)
     calib_grid_pts = np.concatenate(
         (calib_grid_x, calib_grid_y, calib_grid_z), axis=1)
+    # color_im, _ = bin_cam.get_camera_data(avg_depth=False, avg_over_n=10)
+    # cv2.imshow('Calibration', vis_im)
+    # cv2.waitKey(10)
 
-    color_im, _ = bin_cam.get_camera_data(avg_depth=False, avg_over_n=10)
-    vis_im = cv2.circle(
-        color_im, (1, 1), 7, (0, 255, 0), 2)
-    cv2.imshow('Calibration', cv2.cvtColor(vis_im, cv2.COLOR_RGB2BGR))
-    cv2.waitKey(10)
 
     # Move robot to each calibration point in workspace
     measured_pts = list()
     observed_pts = list()
     observed_pix = list()
-
+    
+    x_step = int((workspace_bounds[0, 1]-workspace_bounds[0, 0])/calib_grid_step)
     for calib_pt_idx in range(num_calib_grid_pts):
         tool_position = calib_grid_pts[calib_pt_idx, :]
         tool_position[2] = workspace_bounds[2, 0]
-        print("Moving robot to: ", tool_position, tool_orientation)
+        # print("Moving robot to: ", tool_position, tool_orientation)
         robot.set_pos_derived(tool_position, acc=0.1, vel=0.1)
-        time.sleep(2.0)
-
+        if calib_pt_idx % x_step == 0:
+            time.sleep(10)    
+        time.sleep(10)
         while True:
-            color_im, depth_im = bin_cam.get_camera_data(avg_depth=True, avg_over_n=10)
+            # color_im, depth_im = bin_cam.get_camera_data(avg_depth=True, avg_over_n=10)
             chckr_size = (3, 3)
             refine_criteria = (cv2.TERM_CRITERIA_EPS +
                                cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-            bgr_im = cv2.cvtColor(color_im, cv2.COLOR_RGB2BGR)
-            gray_im = cv2.cvtColor(bgr_im, cv2.COLOR_RGB2GRAY)
+            # bgr_im = cv2.cvtColor(color_im, cv2.COLOR_RGB2BGR)
+            # gray_im = cv2.cvtColor(bgr_im, cv2.COLOR_RGB2GRAY)
+            rame_id, gray_im, depth_im = photoneo_camera.get_frame(True)
             chckr_found, crnrs = cv2.findChessboardCorners(
                 gray_im, chckr_size, None, cv2.CALIB_CB_ADAPTIVE_THRESH)
             if chckr_found:
+                print(f"found checkerboard {calib_pt_idx}")
                 crnrs_refined = cv2.cornerSubPix(
                     gray_im, crnrs, (3, 3), (-1, -1), refine_criteria)
                 block_pix = crnrs_refined[4, 0, :]
                 break
             time.sleep(0.01)
-
+        vis_im = cv2.circle(
+            gray_im, (int(block_pix[0]), int(block_pix[1])), 7, (0, 255, 0), 2)
+        cv2.imwrite(f'real_world/calib/gray_{calib_pt_idx}.png', vis_im)
+        # vis_im = cv2.circle(
+        #     depth_im, (int(block_pix[0]), int(block_pix[1])), 7, (0, 255, 0), 2)
+        # cv2.imwrite(f'real_world/calib/depth_{calib_pt_idx}.png', vis_im)
         # Get observed checkerboard center 3D point in camera space
         block_z = depth_im[
             int(np.round(block_pix[1])),
             int(np.round(block_pix[0]))
         ]
+        # block_x = np.multiply(
+        #     block_pix[1] - bin_cam.color_intr[0, 2],
+        #     block_z / bin_cam.color_intr[0, 0]
+        # )
+        # block_y = np.multiply(
+        #     block_pix[0] - bin_cam.color_intr[1, 2],
+        #     block_z / bin_cam.color_intr[1, 1]
+        # )
         block_x = np.multiply(
-            block_pix[1] - bin_cam.color_intr[0, 2],
-            block_z / bin_cam.color_intr[0, 0]
+            block_pix[1] - photoneo_camera._intr[0, 2],
+            block_z / photoneo_camera._intr[0, 0]
         )
         block_y = np.multiply(
-            block_pix[0] - bin_cam.color_intr[1, 2],
-            block_z / bin_cam.color_intr[1, 1]
+            block_pix[0] - photoneo_camera._intr[1, 2],
+            block_z / photoneo_camera._intr[1, 1]
         )
         if block_z == 0:
             print("block_z 0. Continuing...")
@@ -109,10 +134,11 @@ if __name__ == "__main__":
         observed_pix.append(block_pix)
 
         # Draw and display the corners
-        vis_im = cv2.circle(
-            color_im, (int(block_pix[0]), int(block_pix[1])), 7, (0, 255, 0), 2)
-        cv2.imshow('Calibration', cv2.cvtColor(vis_im, cv2.COLOR_RGB2BGR))
-        cv2.waitKey(10)
+        # vis_im = cv2.circle(
+        #     gray_im, (int(block_pix[0]), int(block_pix[1])), 7, (0, 255, 0), 2)
+        # np.save(f'real_world/calib/calib_{calib_pt_idx}.npy', vis_im)
+        # cv2.imshow('Calibration', cv2.cvtColor(vis_im, cv2.COLOR_RGB2BGR))
+        # cv2.waitKey(10)
 
     # Move robot back to home pose
     robot.homej()
@@ -145,10 +171,14 @@ if __name__ == "__main__":
 
         # Apply z offset and compute new observed points using camera intrinsics
         observed_z = observed_pts[:, 2:] * z_scale
+        # observed_x = np.multiply(
+        #     observed_pix[:, [0]]-bin_cam.color_intr[0, 2], observed_z/bin_cam.color_intr[0, 0])
+        # observed_y = np.multiply(
+        #     observed_pix[:, [1]]-bin_cam.color_intr[1, 2], observed_z/bin_cam.color_intr[1, 1])
         observed_x = np.multiply(
-            observed_pix[:, [0]]-bin_cam.color_intr[0, 2], observed_z/bin_cam.color_intr[0, 0])
+            observed_pix[:, [0]]-photoneo_camera._intr[0, 2], observed_z/photoneo_camera._intr[0, 0])
         observed_y = np.multiply(
-            observed_pix[:, [1]]-bin_cam.color_intr[1, 2], observed_z/bin_cam.color_intr[1, 1])
+            observed_pix[:, [1]]-photoneo_camera._intr[1, 2], observed_z/photoneo_camera._intr[1, 1])
         new_observed_pts = np.concatenate(
             (observed_x, observed_y, observed_z), axis=1)
 

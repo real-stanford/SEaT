@@ -91,7 +91,7 @@ class TSDFHelper:
         tsdf[0, :, :] = 1
         center = None
         if tsdf.min() > level or tsdf.max() < level:
-            print(f"TSDF min {tsdf.min()} or max {tsdf.max()} is out of level :(")
+            print(f"TSDF min {tsdf.min():.3f} or max {tsdf.max():.3f} is out of level :(")
             if center_mesh:
                 return False, center
             else:

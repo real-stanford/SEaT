@@ -8,7 +8,7 @@ sys.path = [str(root_path)] + sys.path
 import hydra
 from omegaconf import DictConfig
 from environment.real.cameras import RealSense
-from real_world.utils import get_crops_wb, get_obj_bounds_mask, get_kit_bounds_mask
+from real_world.rw_utils import get_crops_wb, get_obj_bounds_mask, get_kit_bounds_mask
 import numpy as np
 from evaluate.evaluate_model import dump_seg_vis
 from learning.srg import SRG

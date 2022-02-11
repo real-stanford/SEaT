@@ -30,17 +30,17 @@ import numpy as np
 from numba import njit, prange
 from skimage import measure
 
-try:
-  import pycuda.driver as cuda
-  from pycuda.compiler import SourceModule
-  FUSION_GPU_MODE = 1
-  print('Running fusion in GPU mode!')
-except Exception as err:
-  print('Running fusion in CPU mode')
-  FUSION_GPU_MODE = 0
+# try:
+#   import pycuda.driver as cuda
+#   from pycuda.compiler import SourceModule
+#   FUSION_GPU_MODE = 1
+#   print('Running fusion in GPU mode!')
+# except Exception as err:
+#   print('Running fusion in CPU mode')
+#   FUSION_GPU_MODE = 0
 
-# print('Running fusion in CPU mode')
-# FUSION_GPU_MODE = 0
+print('Running fusion in CPU mode')
+FUSION_GPU_MODE = 0
 
 
 class TSDFVolume:

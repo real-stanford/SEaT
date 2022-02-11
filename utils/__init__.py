@@ -227,7 +227,7 @@ def depth_to_pil_image(d):
 
 
 def get_masked_rgb(mask, rgb):
-    return np.copy(rgb) * mask[:, :, None]
+    return np.copy(rgb) * mask[:, :, np.newaxis]
 
 def get_masked_d(mask, d):
     masked_d = np.copy(d) * mask

@@ -11,7 +11,7 @@ from omegaconf import DictConfig
 import json
 from environment.real.ur5 import UR5_URX
 import pybullet as p
-from real_world.utils import get_kit_bounds, get_obj_bounds, get_workspace_bounds, get_tool_init,\
+from real_world.rw_utils import get_kit_bounds, get_obj_bounds, get_workspace_bounds, get_tool_init,\
     get_client_frame_pose
 from environment.utils import SCENETYPE
 from utils.pointcloud import PointCloud

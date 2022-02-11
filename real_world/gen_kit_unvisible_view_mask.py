@@ -20,7 +20,7 @@ from utils.tsdfHelper import TSDFHelper
 from environment.real.cameras import RealSense
 from icecream import ic as print_ic
 import numpy as np
-from real_world.utils import get_kit_bounds
+from real_world.rw_utils import get_kit_bounds
 from omegaconf import DictConfig
 import hydra
 from utils import ensure_vol_shape

@@ -25,7 +25,7 @@ import open3d as o3d
 from utils.pointcloud import PointCloud
 from PIL import Image
 from environment.utils import SCENETYPE
-from real_world.utils import color_mask_rgb, ensure_minus_pi_to_pi, fix_ur5_rotation, get_crops_wb, get_kit_bounds, get_kit_bounds_mask, get_obj_bounds, get_obj_masks_tilted, get_workspace_bounds, \
+from real_world.rw_utils import color_mask_rgb, ensure_minus_pi_to_pi, fix_ur5_rotation, get_crops_wb, get_kit_bounds, get_kit_bounds_mask, get_obj_bounds, get_obj_masks_tilted, get_workspace_bounds, \
     get_tool_init, get_obj_masks, get_client_frame_pose, transform_mask, get_obj_masks_tilted, clip_angle, get_obj_bounds_mask
 import pybullet as p
 from pybullet_utils.bullet_client import BulletClient

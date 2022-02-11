@@ -6,7 +6,7 @@ import hydra
 import torch
 from utils import seed_all_int, ensure_vol_shape
 from utils.metric import compute_iou, chamfer_distance
-from real_world.utils import get_tn_bounds
+from real_world.rw_utils import get_tn_bounds
 from learning.dataset import ResultDataset
 from learning.vol_match_rotate import VolMatchRotate
 from learning.vol_match_transport import VolMatchTransport

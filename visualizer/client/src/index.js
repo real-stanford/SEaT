@@ -335,7 +335,7 @@ function main() {
         button.onclick = function () {
             if (confirm("Do you want to upload the scene?")) {
                 let raw = get_scene_json();
-                send_json_request("http://127.0.0.1:52000/upload_scene", raw)
+                send_json_request("http://localhost:52000/upload_scene", raw)
                     .then(result => {
                         console.log(result);
                         button.parentNode.removeChild(button);

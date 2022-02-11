@@ -25,3 +25,6 @@ real_world/dataset/
 *.pth
 *.log
 *.png
+real_world/debug*/
+
+*.egg-info

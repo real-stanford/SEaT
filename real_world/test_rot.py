@@ -7,7 +7,7 @@ sys.path = [str(root_path)] + sys.path
 import hydra
 from omegaconf import DictConfig
 from environment.real.ur5 import UR5_URX
-from real_world import utils as rw_utils
+from real_world import rw_utils as rw_utils
 import numpy as np
 import math3d as m3d
 

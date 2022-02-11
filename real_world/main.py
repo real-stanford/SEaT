@@ -22,7 +22,7 @@ import json
 from environment.real.ur5 import UR5_URX
 from learning.srg import SRG
 import pybullet as p
-from real_world.utils import color_mask_rgb, ensure_minus_pi_to_pi, fix_ur5_rotation, get_crops_wb, get_kit_bounds, get_kit_bounds_mask, get_obj_bounds, get_obj_masks_tilted, get_workspace_bounds, \
+from real_world.rw_utils import color_mask_rgb, ensure_minus_pi_to_pi, fix_ur5_rotation, get_crops_wb, get_kit_bounds, get_kit_bounds_mask, get_obj_bounds, get_obj_masks_tilted, get_workspace_bounds, \
     get_tool_init, get_obj_masks, get_client_frame_pose, transform_mask, get_obj_masks_tilted, clip_angle, get_kit_crop_bounds
 from environment.utils import SCENETYPE, get_tableau_palette
 from PIL import Image
@@ -43,25 +43,28 @@ from real_world.gen_kit_unvisible_view_mask import get_kit_unvisible_vol_indices
 from scipy.signal import convolve2d
 from real_world.dataset import REAL_DATASET
 import pickle
+from real_world.pyphoxi import PhoXiSensor
+import cv2
 
 @hydra.main(config_path="../conf", config_name="config")
 def main(cfg: DictConfig):
     # torch.backends.cudnn.enabled = False
-    RUN_DATASET = True
+    RUN_DATASET = False
     # OBJECT: 
     SEND_OBJ_VOL = True
-    DEBUG_SEG = SEND_OBJ_VOL and False
+    DEBUG_SEG = SEND_OBJ_VOL and True
     DO_SC_OBJ = SEND_OBJ_VOL and True
-    DEBUG_SC = DO_SC_OBJ and False
-    SEND_OBJ_PCL = False
+
+    DEBUG_SC = DO_SC_OBJ and True
+    SEND_OBJ_PCL = True
     # KIT: 
     SEND_KIT_VOL = True
     DO_SC_KIT = SEND_KIT_VOL and True
-    DEBUG_SC_KIT = DO_SC_KIT and False
-    SEND_KIT_PCL = False
+    DEBUG_SC_KIT = DO_SC_KIT and True
+    SEND_KIT_PCL = True
     # Action snapping
-    DO_ACTION_SNAPPING = True
-    DEBUG_SNAP = DO_ACTION_SNAPPING and False
+    DO_ACTION_SNAPPING = False
+    DEBUG_SNAP = DO_ACTION_SNAPPING and True
     # ROBOT: 
     RUN_ROBOT = not RUN_DATASET and False    
     SUCTION_CUP_SIZE = 0.045
@@ -76,9 +79,13 @@ def main(cfg: DictConfig):
     bin_cam = None
     dataset = None
     if not RUN_DATASET:
-        bin_cam = RealSense()
-        camera_pose = bin_cam.pose
-        camera_color_intr = bin_cam.depth_intr
+        # bin_cam = RealSense()
+        tcp_ip = "127.0.0.1"
+        tcp_port = 50200
+        bin_cam = PhoXiSensor(tcp_ip, tcp_port)
+        bin_cam.start()
+        camera_pose = bin_cam._extr
+        camera_color_intr = bin_cam._intr
     else:
         dataset = REAL_DATASET(Path("real_world/dataset/"))
         camera_pose = dataset.camera_pose
@@ -156,12 +163,12 @@ def main(cfg: DictConfig):
     }
         
     color_palette = get_tableau_palette()
-    # debug_path_name = cfg.perception.debug_path_name
-    # debug_root = Path(f"real_world/debug/{debug_path_name}/ours")
-    # debug_root.mkdir(exist_ok=True, parents=True)
-    # debug_ind = len(list(debug_root.glob('*')))
-    # debug_path = debug_root / f'T{debug_ind}'
-    # debug_path.mkdir()
+    debug_path_name = cfg.perception.debug_path_name
+    debug_root = Path(f"real_world/debug")
+    debug_root.mkdir(exist_ok=True, parents=True)
+    debug_ind = len(list(debug_root.glob('*')))
+    debug_path = debug_root / f'T{debug_ind}'
+    debug_path.mkdir()
     robot = None
     if RUN_ROBOT:
         robot = UR5_URX(j_vel=0.3, j_acc=0.3, tool_offset=tool_offset)
@@ -188,16 +195,25 @@ def main(cfg: DictConfig):
             print("Please enter the datapoint number [from 0-23]:")
             debug_dir = int(input())
             rgb, d, _, _ = dataset.__getitem__(debug_dir % len(dataset), use_idx_as_datapoint_folder_name=True)
+            print(d.max(), d.min())
+            exit(1)
         else:
             # print_ic(debug_path)
-            rgb, d = bin_cam.get_camera_data(avg_depth=True, avg_over_n=50)
+            # rgb, d = bin_cam.get_camera_data(avg_depth=True, avg_over_n=50)
+            _, gray, d = bin_cam.get_frame(True)
+            rgb = cv2.cvtColor(gray, cv2.COLOR_GRAY2RGB)
 
-        # plt.imshow(rgb)
-        # plt.savefig(debug_path / "rgb.png")
-        # np.save(debug_path / "rgb.npy", rgb)
-        # plt.imshow(d)
-        # plt.savefig(debug_path / "d.png")
-        # np.save(debug_path / "d.npy", d)
+        plt.imshow(rgb)
+        plt.savefig(debug_path / "rgb.png")
+        plt.close()
+        np.save(debug_path / "rgb.npy", rgb)
+        
+        plt.imshow(d)
+        plt.savefig(debug_path / "d.png")
+        plt.close()
+        np.save(debug_path / "d.npy", d)
+
+        exit(0)
 
         def update_scene_dict(name, vol, vol_crop_bounds, center_mesh=True, obj_color=None, vs=voxel_size):
             mesh_filename = f"{name}.obj" 
@@ -239,13 +255,13 @@ def main(cfg: DictConfig):
                     masks.append(mask)
             masks = np.array(masks)
 
-            # if DEBUG_SEG:
-            #     # Visualize masks
-            #     dump_seg_vis(rgb, [], [], np.ones(masks.shape[0]), masks, [], srg.seg_score_threshold, srg.seg_threshold, debug_path)
-                # plt.imshow(rgb)
-                # plt.savefig(debug_path / "rgb.png")
-                # plt.imshow(d)
-                # plt.savefig(debug_path / "d.png")
+            if DEBUG_SEG:
+                # Visualize masks
+                dump_seg_vis(rgb, [], [], np.ones(masks.shape[0]), masks, [], srg.seg_score_threshold, srg.seg_threshold, debug_path)
+                plt.imshow(rgb)
+                plt.savefig(debug_path / "rgb.png")
+                plt.imshow(d)
+                plt.savefig(debug_path / "d.png")
 
             color_indices = np.random.choice(
                 np.arange(len(color_palette)), len(masks), replace=False)
@@ -267,15 +283,15 @@ def main(cfg: DictConfig):
                 sc_inp = ensure_vol_shape(sc_inp, obj_vol_shape)
 
                 if DO_SC_OBJ:
-                    # if DEBUG_SC:
-                    #     np.save(debug_path / f'{i}_inp.npy', sc_inp)
-                    #     dump_vol_render_gif(sc_inp, debug_path / f"{i}_inp.obj", voxel_size, visualize_mesh_gif=False, visualize_tsdf_gif=False)
+                    if DEBUG_SC:
+                        np.save(debug_path / f'{i}_inp.npy', sc_inp)
+                        dump_vol_render_gif(sc_inp, debug_path / f"{i}_inp.obj", voxel_size, visualize_mesh_gif=False, visualize_tsdf_gif=False)
                     sc_inp = torch.tensor(sc_inp, device=srg.device).unsqueeze(dim=0).unsqueeze(dim=0)
                     obj_vol = srg.sc_model(sc_inp).detach().squeeze().cpu().numpy()
                     obj_vol = get_single_biggest_cc_single(obj_vol)
                     obj_vol = extend_to_bottom(obj_vol)
-                    # if DEBUG_SC:
-                    #     dump_vol_render_gif(obj_vol, debug_path / f"{i}_out.obj", voxel_size, visualize_mesh_gif=False, visualize_tsdf_gif=False)
+                    if DEBUG_SC:
+                        dump_vol_render_gif(obj_vol, debug_path / f"{i}_out.obj", voxel_size, visualize_mesh_gif=False, visualize_tsdf_gif=False)
                 else:
                     obj_vol = sc_inp
                 mesh_center = update_scene_dict(name, obj_vol, crop_bounds, center_mesh=True, obj_color=obj_color)
@@ -302,27 +318,27 @@ def main(cfg: DictConfig):
             views = [(rgb, kit_depth, camera_color_intr, camera_pose)]
             #print("=======>FIXME<======= using larger truncation margin factor for kit volume")
             kit_sc_inp = TSDFHelper.tsdf_from_camera_data(
-                views, kit_crop_bounds, voxel_size, trunc_margin_factor=1)
+                views, kit_crop_bounds, voxel_size)
             kit_sc_inp = ensure_vol_shape(kit_sc_inp, kit_vol_shape)
-            kit_sc_inp[kit_unvisible_vol_indices] = 1
+            # kit_sc_inp[kit_unvisible_vol_indices] = 1
             # Shape complete the kit volume as well:
             if DO_SC_KIT:
                 # mask out the unvisible volume area    
-                # if DEBUG_SC_KIT:
-                #     # dump_tsdf_vis(kit_sc_inp, debug_path / f"kit_inp_tsdf.png")
-                #     dump_vol_render_gif(kit_sc_inp, debug_path / f"kit_inp.obj",
-                #                         voxel_size, visualize_mesh_gif=False,
-                #                         visualize_tsdf_gif=False)
+                if DEBUG_SC_KIT:
+                    # dump_tsdf_vis(kit_sc_inp, debug_path / f"kit_inp_tsdf.png")
+                    dump_vol_render_gif(kit_sc_inp, debug_path / f"kit_inp.obj",
+                                        voxel_size, visualize_mesh_gif=False,
+                                        visualize_tsdf_gif=False)
                 kit_sc_inp = torch.tensor(
                     kit_sc_inp, device=device).unsqueeze(dim=0).unsqueeze(dim=0)
                 kit_vol = sc_kit_model(kit_sc_inp)
                 kit_vol = kit_vol.squeeze().detach().cpu().numpy()
                 kit_vol = get_single_biggest_cc_single(kit_vol)
-                # if DEBUG_SC_KIT:
-                #     # dump_tsdf_vis(kit_vol, debug_path / f"kit_out_tsdf.png")
-                #     dump_vol_render_gif(kit_vol, debug_path / f"kit_out.obj",
-                #                         voxel_size, visualize_mesh_gif=False,
-                #                         visualize_tsdf_gif=False)
+                if DEBUG_SC_KIT:
+                    # dump_tsdf_vis(kit_vol, debug_path / f"kit_out_tsdf.png")
+                    dump_vol_render_gif(kit_vol, debug_path / f"kit_out.obj",
+                                        voxel_size, visualize_mesh_gif=False,
+                                        visualize_tsdf_gif=False)
             else:
                 kit_vol = kit_sc_inp
             name = "kit"
@@ -503,23 +519,23 @@ def main(cfg: DictConfig):
                         final_pos, final_ori = np.array(final_pos), np.array(final_ori)
                         final_pos += kit_crop_bounds[:, 0]
 
-                    # if DEBUG_SNAP:
-                    #     #print("=======>FIXME<======= using larger voxel size for debugging snap")
-                    #     voxel_size_debug = voxel_size * 3
-                    #     # Let's first dump the kit full volume:
-                    #     TSDFHelper.to_mesh(p1_vol, debug_path / f"{name}_p1_vol.obj", voxel_size_debug)
-                    #     # Now let's align the user provided pose to this volumes space
-                    #     vol_origin = (user_coords - np.array([*p1_vol.shape]) / 2) * voxel_size_debug 
-                    #     TSDFHelper.to_mesh(p0_vol_rotate, debug_path / f"{name}_p0_user_provided.obj", voxel_size_debug, vol_origin=vol_origin)
-                    #     # Now let's dump the pred things:
-                    #     p0_vol_rotate_corrected = rotate_tsdf(p0_vol_rotate, np.array(p.getEulerFromQuaternion(pred_ori)))
-                    #     vol_origin = (pred_coords - np.array([*p1_vol.shape]) / 2) * voxel_size_debug 
-                    #     TSDFHelper.to_mesh(p0_vol_rotate_corrected, debug_path / f"{name}_p0_snap_corrected.obj", voxel_size_debug, vol_origin=vol_origin)
+                    if DEBUG_SNAP:
+                        #print("=======>FIXME<======= using larger voxel size for debugging snap")
+                        voxel_size_debug = voxel_size * 3
+                        # Let's first dump the kit full volume:
+                        TSDFHelper.to_mesh(p1_vol, debug_path / f"{name}_p1_vol.obj", voxel_size_debug)
+                        # Now let's align the user provided pose to this volumes space
+                        vol_origin = (user_coords - np.array([*p1_vol.shape]) / 2) * voxel_size_debug 
+                        TSDFHelper.to_mesh(p0_vol_rotate, debug_path / f"{name}_p0_user_provided.obj", voxel_size_debug, vol_origin=vol_origin)
+                        # Now let's dump the pred things:
+                        p0_vol_rotate_corrected = rotate_tsdf(p0_vol_rotate, np.array(p.getEulerFromQuaternion(pred_ori)))
+                        vol_origin = (pred_coords - np.array([*p1_vol.shape]) / 2) * voxel_size_debug 
+                        TSDFHelper.to_mesh(p0_vol_rotate_corrected, debug_path / f"{name}_p0_snap_corrected.obj", voxel_size_debug, vol_origin=vol_origin)
 
-                    #     # Now let's dump initial p0_vol to final prediction together
-                    #     p0_vol_rotate_initial_to_final = rotate_tsdf(p0_vol, np.array(p.getEulerFromQuaternion(final_ori)))
-                    #     vol_origin = (pred_coords - np.array([*p1_vol.shape]) / 2) * voxel_size_debug 
-                    #     TSDFHelper.to_mesh(p0_vol_rotate_initial_to_final, debug_path / f"{name}_p0_snap_initial_to_final.obj", voxel_size_debug, vol_origin=vol_origin)
+                        # Now let's dump initial p0_vol to final prediction together
+                        p0_vol_rotate_initial_to_final = rotate_tsdf(p0_vol, np.array(p.getEulerFromQuaternion(final_ori)))
+                        vol_origin = (pred_coords - np.array([*p1_vol.shape]) / 2) * voxel_size_debug 
+                        TSDFHelper.to_mesh(p0_vol_rotate_initial_to_final, debug_path / f"{name}_p0_snap_initial_to_final.obj", voxel_size_debug, vol_origin=vol_origin)
 
                 # print("Kit place pose after action snapping: ",
                 #     final_pos,

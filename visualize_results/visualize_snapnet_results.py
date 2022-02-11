@@ -21,7 +21,7 @@ from utils import (
 )
 from utils.pointcloud import get_pointcloud_color, write_pointcloud
 from utils.tsdfHelper import TSDFHelper, extend_to_bottom, get_single_biggest_cc_single
-from real_world.utils import get_intrinsics, get_empty_depth, get_tn_bounds
+from real_world.rw_utils import get_intrinsics, get_empty_depth, get_tn_bounds
 from learning.srg import SRG
 from learning.dataset import ResultDataset
 from learning.vol_match_rotate import VolMatchRotate

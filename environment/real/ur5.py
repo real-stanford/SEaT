@@ -29,7 +29,7 @@ class UR5_URX(Robot):
         self.j_acc = j_acc
         self.j_vel = j_vel
         self.__home_j_config = np.asarray(
-            [deg_rad(x) for x in [0, -135, 90, -45, -90, 0]])
+            [deg_rad(x) for x in [90, -135, 90, -45, -90, 0]])
         print("UR5:- setting tool offset to: ", tool_offset)
         self.set_tcp(tool_offset)
 
