@@ -201,5 +201,5 @@ def dump_vol_render_gif(
 
     tsdf_vis_path = None
     if visualize_tsdf_gif:
-        tsdf_vis_path = dump_tsdf_vis(v, mesh_path.parent / f"{mesh_path.stem}_tsdf.png")
+        tsdf_vis_path = dump_tsdf_vis(v, mesh_path.parent / f"{mesh_path.stem}_tsdf.gif")
     return vol_gif_path, tsdf_vis_path 

@@ -18,6 +18,7 @@ import pybullet as p
 from scipy.spatial.transform import Rotation
 import sys
 from shutil import rmtree
+from matplotlib import cm
 
 def rand_from_range(r):
     return random.randint(-r+1, r-1)
@@ -229,9 +230,22 @@ def depth_to_pil_image(d):
 def get_masked_rgb(mask, rgb):
     return np.copy(rgb) * mask[:, :, np.newaxis]
 
+def save_imgarr(array, path='test'):
+    """save array as a png image"""
+    if len(array.shape) == 2:
+        array = (array - array.min()) / (array.max() - array.min())
+        array = cm.gist_earth(array)
+        Image.fromarray(np.uint8(array * 255)).save(f'{path}.png')
+    elif len(array.shape) == 3:
+        Image.fromarray(np.uint8(array)).save(f'{path}.png')
+    else:
+        print(f"Error (save_imgarr): bad shape, {array.shape}")
+
 def get_masked_d(mask, d):
     masked_d = np.copy(d) * mask
+    # save_imgarr(masked_d, 'mask1')
     masked_d[mask != 1] = 1e5
+    # save_imgarr(masked_d, 'mask2')
     return masked_d
 
 def get_tsdf_match(pose0_vol, pose1_vol, pose0_width, pose1_bounds, voxel_size):

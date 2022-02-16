@@ -195,8 +195,6 @@ def main(cfg: DictConfig):
             print("Please enter the datapoint number [from 0-23]:")
             debug_dir = int(input())
             rgb, d, _, _ = dataset.__getitem__(debug_dir % len(dataset), use_idx_as_datapoint_folder_name=True)
-            print(d.max(), d.min())
-            exit(1)
         else:
             # print_ic(debug_path)
             # rgb, d = bin_cam.get_camera_data(avg_depth=True, avg_over_n=50)
@@ -212,8 +210,6 @@ def main(cfg: DictConfig):
         plt.savefig(debug_path / "d.png")
         plt.close()
         np.save(debug_path / "d.npy", d)
-
-        exit(0)
 
         def update_scene_dict(name, vol, vol_crop_bounds, center_mesh=True, obj_color=None, vs=voxel_size):
             mesh_filename = f"{name}.obj" 

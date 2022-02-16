@@ -39,7 +39,7 @@ def get_workspace_bounds():
         return np.array([
             [-0.3, 0.3],
             [-0.7, -0.4],
-            [0, 0.1]
+            [-0.03, 0.1]
         ])
     return np.array([
         [-0.6785, -0.3215],
@@ -270,13 +270,13 @@ def get_quadrilateral_mask(orig_image_shape, quadrilateral_points):
     return mask
 
 
-def get_obj_bounds_mask(cam_pose, cam_intr, orig_img_shape, use_cache=False):
+def get_obj_bounds_mask(cam_pose, cam_intr, orig_img_shape, use_cache=True):
     obj_mask_path =  Path("real_world/obj_mask.npy")
     if use_cache and obj_mask_path.exists():
         print(f"Using cached mask from path: {obj_mask_path}")
         mask = np.load(obj_mask_path)
     else:
-        # print(f"obj bounds mask cache not found. regenerating ...")
+        print(f"obj bounds mask cache not found. regenerating ...")
         points_objects = get_obj_points()
         points_objects_uv = transform_world_to_camera_multi(points_objects, cam_pose, cam_intr)
         mask = get_quadrilateral_mask(orig_img_shape, points_objects_uv)
@@ -284,13 +284,13 @@ def get_obj_bounds_mask(cam_pose, cam_intr, orig_img_shape, use_cache=False):
     return mask
 
 
-def get_kit_bounds_mask(cam_pose, cam_intr, orig_img_shape, use_cache=False, show_mask:bool = False):
+def get_kit_bounds_mask(cam_pose, cam_intr, orig_img_shape, use_cache=True, show_mask:bool = False):
     kit_mask_path =  Path("real_world/kit_mask.npy")
     if use_cache and kit_mask_path.exists():
         print(f"Using cached mask from path: {kit_mask_path}")
         mask = np.load(kit_mask_path)
     else:
-        # print(f"obj bounds mask cache not found. regenerating ...")
+        print(f"obj bounds mask cache not found. regenerating ...")
         points_kit = get_kit_points()
         points_kit_uv = transform_world_to_camera_multi(points_kit, cam_pose, cam_intr)
         # print(points_kit_uv)

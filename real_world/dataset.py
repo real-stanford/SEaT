@@ -20,10 +20,7 @@ class REAL_DATASET(Dataset):
         ]
         self.datapoint_paths.sort(key=lambda x: int(str(x.name)))
         self.camera_pose = np.load(dataset_root / "camera_pose.npy")
-        self.camera_depth_scale = np.load(
-            dataset_root / "camera_depth_scale.npy")
-        self.camera_color_intr = np.load(
-            dataset_root / "camera_color_intr.npy")
+        # self.camera_depth_scale = np.load(dataset_root / "camera_depth_scale.npy")
         self.camera_depth_intr = np.load(dataset_root / "camera_depth_intr.npy")
         self.kit_bounds_mask = (np.load(dataset_root / "kit_bounds_mask.npy") <= 0)
 
@@ -37,6 +34,8 @@ class REAL_DATASET(Dataset):
             datapoint_path = self.datapoint_paths[idx]
         rgb = np.load(datapoint_path / "rgb.npy")
         d = np.load(datapoint_path / "d.npy")
+        empty = np.load('real_world/dataset/empty_depth.npy')
+        d[d==3] = empty[d==3]
 
         gt_mesh_paths = None
         gt_id_file = datapoint_path / "gt_ids.json"

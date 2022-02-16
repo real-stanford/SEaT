@@ -26,5 +26,6 @@ real_world/dataset/
 *.log
 *.png
 real_world/debug*/
+debug_photoneo/debug*/
 
 *.egg-info
