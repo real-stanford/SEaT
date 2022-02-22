@@ -63,7 +63,7 @@ def main(cfg: DictConfig):
     DEBUG_SC_KIT = DO_SC_KIT and True
     SEND_KIT_PCL = True
     # Action snapping
-    DO_ACTION_SNAPPING = False
+    DO_ACTION_SNAPPING = True
     DEBUG_SNAP = DO_ACTION_SNAPPING and True
     # ROBOT: 
     RUN_ROBOT = not RUN_DATASET and False    
@@ -175,8 +175,8 @@ def main(cfg: DictConfig):
         print("Moving robot to home")
         robot.homej()
     while True:
-        if not RUN_DATASET:
-            input("Please set scene and press ENTER ....")
+        # if not RUN_DATASET:
+        #     input("Please set scene and press ENTER ....")
         system_start_time = time.time()
         # Due to limited gpu resources, we unload and load models as required
         srg = None
@@ -262,8 +262,6 @@ def main(cfg: DictConfig):
             color_indices = np.random.choice(
                 np.arange(len(color_palette)), len(masks), replace=False)
             for i, mask in enumerate(masks):
-                if np.sum(mask==1) < 3000:
-                    continue
                 name = f"obj_{i}"
                 obj_color = color_palette[color_indices[i]]
                 masked_d = get_masked_d(mask, d)
@@ -316,15 +314,16 @@ def main(cfg: DictConfig):
             kit_sc_inp = TSDFHelper.tsdf_from_camera_data(
                 views, kit_crop_bounds, voxel_size)
             kit_sc_inp = ensure_vol_shape(kit_sc_inp, kit_vol_shape)
-            # kit_sc_inp[kit_unvisible_vol_indices] = 1
+            kit_sc_inp[kit_unvisible_vol_indices] = 1
+            # np.save('real_world/kit_bounds_mask.npy', kit_sc_inp)
+            # dump_tsdf_vis(kit_sc_inp, debug_path / f"kit_inp_tsdf.png")
+            dump_vol_render_gif(kit_sc_inp, debug_path / f"kit_inp.obj",
+                                voxel_size, visualize_mesh_gif=False,
+                                visualize_tsdf_gif=False)
             # Shape complete the kit volume as well:
             if DO_SC_KIT:
-                # mask out the unvisible volume area    
-                if DEBUG_SC_KIT:
-                    # dump_tsdf_vis(kit_sc_inp, debug_path / f"kit_inp_tsdf.png")
-                    dump_vol_render_gif(kit_sc_inp, debug_path / f"kit_inp.obj",
-                                        voxel_size, visualize_mesh_gif=False,
-                                        visualize_tsdf_gif=False)
+                # mask out the unvisible volume area   
+                   
                 kit_sc_inp = torch.tensor(
                     kit_sc_inp, device=device).unsqueeze(dim=0).unsqueeze(dim=0)
                 kit_vol = sc_kit_model(kit_sc_inp)
@@ -397,53 +396,58 @@ def main(cfg: DictConfig):
                 pc.compute_normals()
                 ns = pc.normals
                 point_cloud = pc.point_cloud
-                valid_indices = ns[:, 2] > 0.99
-                if len(valid_indices) == 0:  # No vertical normal found
-                    print(f"No vertical normal found. Using position closed to the most vertical \
-                        positions {ns[:, 2].max()}")
-                    valid_indices = ns[:, 2] > ns[:, 2].max() - 0.1
-                # - Choose a graspable point from such location
-                pc_vertical = point_cloud[valid_indices][:, :3]
-                # Filter the point cloud outside view bounds
-                obj_bounds = name_obj_crop_bounds[name]
-                valid_indices = np.ones(pc_vertical.shape[0], dtype=bool)
-                valid_indices[pc_vertical[:, 0] < obj_bounds[0, 0]] = False
-                valid_indices[pc_vertical[:, 0] > obj_bounds[0, 1]] = False
-                valid_indices[pc_vertical[:, 1] < obj_bounds[1, 0]] = False
-                valid_indices[pc_vertical[:, 1] > obj_bounds[1, 1]] = False
-                valid_indices[pc_vertical[:, 2] < obj_bounds[2, 0]] = False
-                valid_indices[pc_vertical[:, 2] > obj_bounds[2, 1]] = False
-                pc_vertical = pc_vertical[valid_indices]
-                # z value: just use the mean z value of p_verticalc
-                gp_z = pc_vertical[:, 2].mean() + SUCTION_Z_ADJUSTMENT
-                # for x,y value, create binary mask by projecting pc_vertical on xy plane
-                mask_size = np.ceil(
-                    (obj_bounds[:2, 1] - obj_bounds[:2, 0]) / voxel_size).astype(int)
-                pc_mask = np.zeros((mask_size[0], mask_size[1]))
-                # For every point, project it here
-                x_indices = np.floor(
-                    (pc_vertical[:, 0] - obj_bounds[0, 0]) / voxel_size).astype(int)
-                y_indices = np.floor(
-                    (pc_vertical[:, 1] - obj_bounds[1, 0]) / voxel_size).astype(int)
-                pc_mask[x_indices, y_indices] = 1
+
+                gp_x = point_cloud[:, 0].mean()
+                gp_y = point_cloud[:, 1].mean() 
+                gp_z = point_cloud[:, 2].mean() + SUCTION_Z_ADJUSTMENT
+
+                # valid_indices = ns[:, 2] > 0.99
+                # if len(valid_indices) == 0:  # No vertical normal found
+                #     print(f"No vertical normal found. Using position closed to the most vertical \
+                #         positions {ns[:, 2].max()}")
+                #     valid_indices = ns[:, 2] > ns[:, 2].max() - 0.1
+                # # - Choose a graspable point from such location
+                # pc_vertical = point_cloud[valid_indices][:, :3]
+                # # Filter the point cloud outside view bounds
+                # obj_bounds = name_obj_crop_bounds[name]
+                # valid_indices = np.ones(pc_vertical.shape[0], dtype=bool)
+                # valid_indices[pc_vertical[:, 0] < obj_bounds[0, 0]] = False
+                # valid_indices[pc_vertical[:, 0] > obj_bounds[0, 1]] = False
+                # valid_indices[pc_vertical[:, 1] < obj_bounds[1, 0]] = False
+                # valid_indices[pc_vertical[:, 1] > obj_bounds[1, 1]] = False
+                # valid_indices[pc_vertical[:, 2] < obj_bounds[2, 0]] = False
+                # valid_indices[pc_vertical[:, 2] > obj_bounds[2, 1]] = False
+                # pc_vertical = pc_vertical[valid_indices]
+                # # z value: just use the mean z value of p_verticalc
+                # gp_z = pc_vertical[:, 2].mean() + SUCTION_Z_ADJUSTMENT
+                # # for x,y value, create binary mask by projecting pc_vertical on xy plane
+                # mask_size = np.ceil(
+                #     (obj_bounds[:2, 1] - obj_bounds[:2, 0]) / voxel_size).astype(int)
+                # pc_mask = np.zeros((mask_size[0], mask_size[1]))
+                # # For every point, project it here
+                # x_indices = np.floor(
+                #     (pc_vertical[:, 0] - obj_bounds[0, 0]) / voxel_size).astype(int)
+                # y_indices = np.floor(
+                #     (pc_vertical[:, 1] - obj_bounds[1, 0]) / voxel_size).astype(int)
+                # pc_mask[x_indices, y_indices] = 1
                 
-                # Now I apply an identity convolution filter of vacuum size.
-                conv_filter_size = np.ceil(SUCTION_CUP_SIZE / voxel_size).astype(int)
-                conv_filter = np.ones((conv_filter_size, conv_filter_size))
-                # Convolve the pc_mask with it.
-                pc_mask_convolved = convolve2d(pc_mask, conv_filter, mode="same")
-                # then choose the pixel with maximum value 
-                max_indices = np.unravel_index(
-                    np.argmax(pc_mask_convolved), pc_mask_convolved.shape)
+                # # Now I apply an identity convolution filter of vacuum size.
+                # conv_filter_size = np.ceil(SUCTION_CUP_SIZE / voxel_size).astype(int)
+                # conv_filter = np.ones((conv_filter_size, conv_filter_size))
+                # # Convolve the pc_mask with it.
+                # pc_mask_convolved = convolve2d(pc_mask, conv_filter, mode="same")
+                # # then choose the pixel with maximum value 
+                # max_indices = np.unravel_index(
+                #     np.argmax(pc_mask_convolved), pc_mask_convolved.shape)
                 # # Visualization 
-                # fig, ax = plt.subplots(1, 2)
-                # ax[0].imshow(pc_mask)
-                # ax[1].imshow(pc_mask_convolved)
-                # marker = plt.Circle((max_indices[1], max_indices[0]), 1.5, color="red")
-                # ax[1].add_patch(marker)
-                # plt.show()
-                # Ok. Now I just need to transform this position back to world space.
-                gp_x, gp_y = np.array([max_indices[0], max_indices[1]]) * voxel_size + obj_bounds[:2, 0]
+                # # fig, ax = plt.subplots(1, 2)
+                # # ax[0].imshow(pc_mask)
+                # # ax[1].imshow(pc_mask_convolved)
+                # # marker = plt.Circle((max_indices[1], max_indices[0]), 1.5, color="red")
+                # # ax[1].add_patch(marker)
+                # # plt.show()
+                # # Ok. Now I just need to transform this position back to world space.
+                # gp_x, gp_y = np.array([max_indices[0], max_indices[1]]) * voxel_size + obj_bounds[:2, 0]
                 gp = np.array([gp_x, gp_y, gp_z])
                 
                 final_pos, final_ori = val["upd_pos"], val["upd_ori"]

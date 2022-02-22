@@ -18,14 +18,20 @@ from utils.pointcloud import PointCloud
 import open3d as o3d
 from utils import mkdir_fresh
 from icecream import ic as print_ic
-
+from real_world.pyphoxi import PhoXiSensor
+import cv2
 
 @hydra.main(config_path="../conf", config_name="config")
 def main(cfg: DictConfig):
-    bin_cam = RealSense()
-    camera_pose = bin_cam.pose
-    camera_color_intr = bin_cam.depth_intr
-
+    # bin_cam = RealSense()
+    # camera_pose = bin_cam.pose
+    # camera_color_intr = bin_cam.depth_intr
+    tcp_ip = "127.0.0.1"
+    tcp_port = 50200
+    bin_cam = PhoXiSensor(tcp_ip, tcp_port)
+    bin_cam.start()
+    camera_pose = bin_cam._extr
+    camera_color_intr = bin_cam._intr
     bounds_ws = get_workspace_bounds()
     bounds_obj = get_obj_bounds()
     bounds_kit = get_kit_bounds()
@@ -83,7 +89,9 @@ def main(cfg: DictConfig):
         print_ic(debug_path)
 
         system_start_time = time.time()
-        rgb, d = bin_cam.get_camera_data(avg_depth=True, avg_over_n=50)
+        # rgb, d = bin_cam.get_camera_data(avg_depth=True, avg_over_n=50)
+        _, gray, d = bin_cam.get_frame(True)
+        rgb = cv2.cvtColor(gray, cv2.COLOR_GRAY2RGB)
 
         pcl = PointCloud(rgb, d, camera_color_intr)
         pcl.make_pointcloud()

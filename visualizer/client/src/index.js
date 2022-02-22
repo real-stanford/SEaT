@@ -194,16 +194,16 @@ function main() {
     const loader = new PLYLoader();
     let obj_pc;
     let kit_pc;
-    loader.load('scenes/json_scene/scene_KIT_pcl.ply', function (geometry) {
-        const material = new THREE.PointsMaterial({ size: 0.01, vertexColors: true });
-        obj_pc = new THREE.Points(geometry, material);
-        scene.add(obj_pc);
-    });
-    loader.load('scenes/json_scene/scene_OBJECTS_pcl.ply', function (geometry) {
-        const material = new THREE.PointsMaterial({ size: 0.01, vertexColors: true });
-        kit_pc = new THREE.Points(geometry, material);
-        scene.add(kit_pc);
-    });
+    // loader.load('scenes/json_scene/scene_KIT_pcl.ply', function (geometry) {
+    //     const material = new THREE.PointsMaterial({ size: 0.01, vertexColors: true });
+    //     obj_pc = new THREE.Points(geometry, material);
+    //     scene.add(obj_pc);
+    // });
+    // loader.load('scenes/json_scene/scene_OBJECTS_pcl.ply', function (geometry) {
+    //     const material = new THREE.PointsMaterial({ size: 0.01, vertexColors: true });
+    //     kit_pc = new THREE.Points(geometry, material);
+    //     scene.add(kit_pc);
+    // });
 
     function transformControlSetRotate() {
         transformControls.setMode("rotate");

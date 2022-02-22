@@ -37,8 +37,8 @@ def get_tn_bounds():
 def get_workspace_bounds():
     if CAM==0:
         return np.array([
-            [-0.3, 0.3],
-            [-0.7, -0.4],
+            [-0.4, 0.2],
+            [-0.75, -0.45],
             [-0.03, 0.1]
         ])
     return np.array([
@@ -290,7 +290,7 @@ def get_kit_bounds_mask(cam_pose, cam_intr, orig_img_shape, use_cache=True, show
         print(f"Using cached mask from path: {kit_mask_path}")
         mask = np.load(kit_mask_path)
     else:
-        print(f"obj bounds mask cache not found. regenerating ...")
+        print(f"kit bounds mask cache not found. regenerating ...")
         points_kit = get_kit_points()
         points_kit_uv = transform_world_to_camera_multi(points_kit, cam_pose, cam_intr)
         # print(points_kit_uv)

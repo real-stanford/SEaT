@@ -139,7 +139,7 @@ class PhoXiSensor(object):
 
         return frame_id, gray_img, depth_img
 
-    def get_frame(self, undistort=False, fill_hole=False):
+    def get_frame(self, undistort=False):
         """Fetches the data from the TCP server.
         """
         frame_id, gray_img, depth_img = self._process_packet(self._get_packet())
@@ -156,7 +156,10 @@ class PhoXiSensor(object):
         d[np.isnan(d)] = self.max_depth
         d[d == 0] = self.max_depth
         d[d > self.max_depth] = self.max_depth
-
+        import os 
+        if os.path.exists('real_world/empty_depth.npy'):
+            empty = np.load('real_world/empty_depth.npy')
+            d[d==3] = empty[d==3]
         # if undistort:
         #     H, W = gray_img.shape
         #     new_intr, _ = cv2.getOptimalNewCameraMatrix(self._intr, self._dist, (W, H), 1)
@@ -164,13 +167,6 @@ class PhoXiSensor(object):
         #     gray_img = cv2.remap(gray_img, map_x, map_y, cv2.INTER_LINEAR)
         # depth_img = depth_img * self._depth_scale
 
-        if fill_hole:
-            print("filling depth holes")
-            for i in range(d.shape[0]):
-                for j in range(d.shape[1]):
-                    if i != 0 and np.isnan(d[i, j]):
-                        d[i, j] = d[i-1, j]
-            print("\tdone")          
         return frame_id, gray_img, d
 
     @property

@@ -27,7 +27,7 @@ from utils import ensure_vol_shape
 
 
 def __get_kit_unvisible_view_mask_path():
-    return Path("real_world/dataset/kit_bounds_mask.npy")
+    return Path("real_world/kit_bounds_mask.npy")
 
 
 def get_kit_unvisible_vol_indices():
