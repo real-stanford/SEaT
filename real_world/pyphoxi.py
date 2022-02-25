@@ -102,6 +102,8 @@ class PhoXiSensor(object):
         self._depth_scale = 1
         if os.path.exists(cam_pose_path):
             self._extr = np.loadtxt(cam_pose_path)
+        # self._extr[0, 3] += 0.016
+        # self._extr[1, 3] += -0.0095
         if os.path.exists(cam_depth_scale_path):
             self._depth_scale = np.loadtxt(cam_depth_scale_path)
         self._set_default_params()
@@ -139,13 +141,12 @@ class PhoXiSensor(object):
 
         return frame_id, gray_img, depth_img
 
-    def get_frame(self, undistort=False):
+    def get_frame(self, undistort=False, n=5):
         """Fetches the data from the TCP server.
         """
         frame_id, gray_img, depth_img = self._process_packet(self._get_packet())
         
         self.max_depth = 3
-        n = 5
         ds = np.empty((gray_img.shape[0], gray_img.shape[1], n), dtype=np.float64)
         for i in range(n):
             frame_id, gray_img, depth_img = self._process_packet(self._get_packet())
@@ -156,10 +157,10 @@ class PhoXiSensor(object):
         d[np.isnan(d)] = self.max_depth
         d[d == 0] = self.max_depth
         d[d > self.max_depth] = self.max_depth
-        import os 
-        if os.path.exists('real_world/empty_depth.npy'):
-            empty = np.load('real_world/empty_depth.npy')
-            d[d==3] = empty[d==3]
+        # import os 
+        # if os.path.exists('real_world/empty_depth.npy'):
+        #     empty = np.load('real_world/empty_depth.npy')
+        #     d[d==3] = empty[d==3]
         # if undistort:
         #     H, W = gray_img.shape
         #     new_intr, _ = cv2.getOptimalNewCameraMatrix(self._intr, self._dist, (W, H), 1)

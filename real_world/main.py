@@ -66,14 +66,14 @@ def main(cfg: DictConfig):
     DO_ACTION_SNAPPING = True
     DEBUG_SNAP = DO_ACTION_SNAPPING and True
     # ROBOT: 
-    RUN_ROBOT = not RUN_DATASET and False    
+    RUN_ROBOT = not RUN_DATASET and True    
     SUCTION_CUP_SIZE = 0.045
 
     CHOOSE_BEST_YAW = False
 
     # Sometimes suction cup does not touch the object while picking it up.
     # We manually adjust the target grasp position by this much in z direction
-    SUCTION_Z_ADJUSTMENT = -0.005
+    SUCTION_Z_ADJUSTMENT = -0.02
     MAX_YAW = np.pi / 3
 
     bin_cam = None
@@ -175,6 +175,7 @@ def main(cfg: DictConfig):
         print("Moving robot to home")
         robot.homej()
     while True:
+  
         # if not RUN_DATASET:
         #     input("Please set scene and press ENTER ....")
         system_start_time = time.time()
@@ -189,6 +190,8 @@ def main(cfg: DictConfig):
         name_vols = dict()
         name_obj_crop_bounds = dict()  # Used for finding the top-down grasping position
         name_transformations = dict()
+        all_user_pose = {}
+        all_snap_pose = {}
 
         # Upload scene to client
         if RUN_DATASET:
@@ -329,6 +332,7 @@ def main(cfg: DictConfig):
                 kit_vol = sc_kit_model(kit_sc_inp)
                 kit_vol = kit_vol.squeeze().detach().cpu().numpy()
                 kit_vol = get_single_biggest_cc_single(kit_vol)
+                
                 if DEBUG_SC_KIT:
                     # dump_tsdf_vis(kit_vol, debug_path / f"kit_out_tsdf.png")
                     dump_vol_render_gif(kit_vol, debug_path / f"kit_out.obj",
@@ -338,8 +342,9 @@ def main(cfg: DictConfig):
                 kit_vol = kit_sc_inp
             name = "kit"
             name_vols[name] = kit_vol
-            update_scene_dict(name, kit_vol, kit_crop_bounds, center_mesh=False,
+            kit_center = update_scene_dict(name, kit_vol, kit_crop_bounds, center_mesh=False,
                               vs=voxel_size, obj_color=np.array([78, 121, 167]) / 255)
+            name_transformations[name] = kit_center
         if SEND_KIT_VOL:
             update_scene_dict_kit()
         if sc_kit_model is not None:
@@ -451,6 +456,7 @@ def main(cfg: DictConfig):
                 gp = np.array([gp_x, gp_y, gp_z])
                 
                 final_pos, final_ori = val["upd_pos"], val["upd_ori"]
+                all_user_pose[name] = (final_pos, final_ori)
                 # print("Kit place pose before action snapping: ",
                 #     final_pos,
                 #     np.array(p.getEulerFromQuaternion(final_ori)) * 180 / np.pi
@@ -518,7 +524,7 @@ def main(cfg: DictConfig):
                         )
                         final_pos, final_ori = np.array(final_pos), np.array(final_ori)
                         final_pos += kit_crop_bounds[:, 0]
-
+                        all_snap_pose[name] = (final_pos, final_ori)
                     if DEBUG_SNAP:
                         #print("=======>FIXME<======= using larger voxel size for debugging snap")
                         voxel_size_debug = voxel_size * 3
@@ -665,7 +671,17 @@ def main(cfg: DictConfig):
             del transporter
             del rotator
             torch.cuda.empty_cache()
-        total_system_time = time.time() - system_start_time
+        datapoint = {
+            'masks': name_mask,
+            'vols': name_vols,
+            'init_pos': name_transformations,
+            'user_pose': all_user_pose,
+            'snap_pose': all_snap_pose,
+            'depth_image': d,
+            'gray': gray
+        }
+        pickle.dump(datapoint, open(debug_path / f"datapoint.pkl", 'wb'))
+        # total_system_time = time.time() - system_start_time
         # print_ic(total_system_time)
         # np.savetxt(debug_path / "total_system_time.txt", [total_system_time])
         print("====================================================\n")

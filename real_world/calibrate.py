@@ -20,8 +20,8 @@ def adjust_gamma(image, gamma=1.0):
     
 def get_calibration_bounds():
     return np.array([
-        [-0.16, 0.08],
-        [-0.74, -0.58],
+        [-0.2, 0.1],
+        [-0.75, -0.55],
         [0.02, 0.258]
     ])
 
@@ -43,7 +43,7 @@ if __name__ == "__main__":
     # input("Running calibration. Press Enter to continue...")
 
     # Constants
-    calib_grid_step = 0.08
+    calib_grid_step = 0.1
     checkerboard_offset = np.array([-(0.03356 + 0.001) / 2, 0, tool_offset[2] - 0.09])
 
     # Construct 3D calibration grid across workspace
@@ -70,6 +70,11 @@ if __name__ == "__main__":
     observed_pts = list()
     observed_pix = list()
     
+    sleep_time = 5
+    def do_sleep():
+        print("Sleeping start...")
+        time.sleep(sleep_time)
+        print("\tsleeping finished")
     x_step = int((workspace_bounds[0, 1]-workspace_bounds[0, 0])/calib_grid_step)
     for calib_pt_idx in range(num_calib_grid_pts):
         tool_position = calib_grid_pts[calib_pt_idx, :]
@@ -77,8 +82,8 @@ if __name__ == "__main__":
         # print("Moving robot to: ", tool_position, tool_orientation)
         robot.set_pos_derived(tool_position, acc=0.1, vel=0.1)
         if calib_pt_idx % x_step == 0:
-            time.sleep(10)    
-        time.sleep(10)
+            time.sleep(sleep_time)    
+        time.sleep(sleep_time)
         while True:
             # color_im, depth_im = bin_cam.get_camera_data(avg_depth=True, avg_over_n=10)
             chckr_size = (3, 3)
@@ -86,7 +91,7 @@ if __name__ == "__main__":
                                cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
             # bgr_im = cv2.cvtColor(color_im, cv2.COLOR_RGB2BGR)
             # gray_im = cv2.cvtColor(bgr_im, cv2.COLOR_RGB2GRAY)
-            rame_id, gray_im, depth_im = photoneo_camera.get_frame(True)
+            rame_id, gray_im, depth_im = photoneo_camera.get_frame(True, n=1)
             chckr_found, crnrs = cv2.findChessboardCorners(
                 gray_im, chckr_size, None, cv2.CALIB_CB_ADAPTIVE_THRESH)
             if chckr_found:

@@ -64,7 +64,7 @@ def get_client_frame_pose():
 
 
 def get_tool_init():
-    tool_offset = [0.0, -0.1, 0.270, 0, np.pi, 0]
+    tool_offset = [0.0, -0.1, 0.270 + 0.02079, 0, np.pi, 0]
     tool_orientation = np.array([0, 0,  0], dtype=np.float)
     return tool_offset, tool_orientation
 

@@ -8,7 +8,7 @@ def extend_to_bottom(tsdf_vol):
     h, w, d = tsdf_vol.shape
     tsdf_vol_new = tsdf_vol.copy()
     for i in range(h):
-        for j in range(d):
+        for j in range(w):
             col = np.where(tsdf_vol[i,j,:]<0)[0]
             if len(col) == 0:
                 continue

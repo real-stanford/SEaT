@@ -10,7 +10,7 @@ import cv2
 from environment.real.ur5 import UR5_URX
 from environment.real.cameras import RealSense
 from real_world.rw_utils import get_tool_init, get_workspace_bounds
-
+from real_world.pyphoxi import PhoXiSensor
 
 if __name__ == "__main__":
     # rows: x,y,z; cols: min,max
@@ -22,11 +22,15 @@ if __name__ == "__main__":
     input("Running touch script. Press Enter to continue...")
 
     # See https://github.com/columbia-robovision/PyRealSense for more details
-    bin_cam = RealSense()
+    tcp_ip = "127.0.0.1"
+    tcp_port = 50200
+    bin_cam = PhoXiSensor(tcp_ip, tcp_port)
+    bin_cam.start()
+    camera_pose = bin_cam._extr
+    camera_color_intr = bin_cam._intr
 
     # Callback function for clicking on OpenCV window
     click_point_pix = ()
-    color_im, depth_im = bin_cam.get_camera_data(avg_depth=False)
 
     click_num = 0
     def mouseclick_callback(event, x, y, flags, param):
@@ -37,17 +41,17 @@ if __name__ == "__main__":
 
             # Get click point in camera coordinates
             click_z = depth_im[y, x]
-            click_x = (x-bin_cam.color_intr[0, 2]) * \
-                click_z/bin_cam.color_intr[0, 0]
-            click_y = (y-bin_cam.color_intr[1, 2]) * \
-                click_z/bin_cam.color_intr[1, 1]
+            click_x = (x-camera_color_intr[0, 2]) * \
+                click_z/camera_color_intr[0, 0]
+            click_y = (y-camera_color_intr[1, 2]) * \
+                click_z/camera_color_intr[1, 1]
             if click_z == 0:
                 return
             click_point = np.asarray([click_x, click_y, click_z])
             click_point = np.append(click_point, 1.0).reshape(4, 1)
 
             # Convert camera coordinates to robot coordinates
-            target_position = np.dot(bin_cam.pose, click_point)
+            target_position = np.dot(camera_pose, click_point)
             target_position = target_position[0:3, 0]
             print(target_position)
 
@@ -66,11 +70,10 @@ if __name__ == "__main__":
     cv2.setMouseCallback('color', mouseclick_callback)
 
     while True:
-        color_im, depth_im = bin_cam.get_camera_data(avg_depth=True, avg_over_n=10)
-        bgr_data = cv2.cvtColor(color_im, cv2.COLOR_RGB2BGR)
+        _, gray, depth_im = bin_cam.get_frame(True, n=1)
+        bgr_data = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
         if len(click_point_pix) != 0:
             bgr_data = cv2.circle(bgr_data, click_point_pix, 7, (0, 0, 255), 2)
         cv2.imshow('color', bgr_data)
-
         if cv2.waitKey(1) == ord('c'):
             break
