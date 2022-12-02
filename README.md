@@ -168,13 +168,12 @@ By default, this will generate 3D print models inside directory [assets/test_rea
 ## BibTeX
 
 ```
-@misc{agrawal2021scene,
-      title={Scene Editing as Teleoperation: A Case Study in 6DoF Kit Assembly}, 
-      author={Shubham Agrawal and Yulong Li and Jen-Shuo Liu and Steven K. Feiner and Shuran Song},
-      year={2021},
-      eprint={2110.04450},
-      archivePrefix={arXiv},
-      primaryClass={cs.RO}
+@inproceedings{yulong2022scene,
+  title={Scene Editing as Teleoperation: A Case Study in 6DoF Kit Assembly},
+  author={Li, Yulong, and Agrawal, Shubham, and Liu, Jen-Shuo, and Feiner, Steven, and Song, Shuran},
+  booktitle={2022 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)},
+  year={2022},
+  organization={IEEE}
 }
 ```
 
