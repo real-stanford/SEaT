@@ -1,6 +1,6 @@
 # Scene Editing as Teleoperation: A Case Study in 6DoF Kit Assembly
-[Shubham Agrawal](https://submagr.github.io/),
 [Yulong Li](https://www.columbia.edu/~yl4095/),
+[Shubham Agrawal](https://submagr.github.io/),
 Jen-shuo Liu,
 [Steven Feiner](http://www.cs.columbia.edu/~feiner/),
 [Shuran Song](https://www.cs.columbia.edu/~shurans/)
